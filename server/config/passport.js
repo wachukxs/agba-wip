@@ -18,21 +18,25 @@ const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = secret;
 
-passport.use(
-  new JwtStrategy(opts, (payload, done) => {
-    User.findById(payload.id)
-      .then(user => {
-        if (user) {
-          return done(null, user);
-        }
-
-        return done(null, false);
-      })
-      .catch(err => {
-        return done(err, false);
-      });
-  })
-);
+try {
+  passport.use(
+    new JwtStrategy(opts, (payload, done) => {
+      User.findById(payload.id)
+        .then(user => {
+          if (user) {
+            return done(null, user);
+          }
+  
+          return done(null, false);
+        })
+        .catch(err => {
+          return done(err, false);
+        });
+    })
+  );
+} catch (error) {
+  console.error('Missing Jwt...');
+}
 
 module.exports = async app => {
   app.use(passport.initialize());
